@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(flutter --version)",
+      "Read(//Users/theokramer/Documents/gym_app/**)",
+      "Bash(flutter create:*)",
+      "Bash(flutter pub:*)",
+      "Bash(flutter analyze:*)",
+      "Bash(flutter build:*)",
+      "WebSearch",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(curl -s \"https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/dist/exercises.json\" -o /Users/theokramer/Documents/fitlingo/assets/exercises.json)",
+      "Bash(python3 -c \"import json; d=json.load\\(open\\('/Users/theokramer/Documents/fitlingo/assets/exercises.json'\\)\\); print\\(f'{len\\(d\\)} exercises'\\); print\\('Fields:', list\\(d[0].keys\\(\\)\\)\\)\")",
+      "Bash(curl:*)",
+      "Bash(ls -la /Users/theokramer/Documents/fitlingo/lib/screens/*.dart)",
+      "Bash(awk '{print $NF}')",
+      "Bash(xargs basename:*)",
+      "Bash(wc:*)",
+      "Bash(grep -n \"onTap:\\\\s*\\(\\) {}\" /Users/theokramer/Documents/fitlingo/lib/screens/*.dart /Users/theokramer/Documents/fitlingo/lib/widgets/*.dart)",
+      "Bash(grep:*)",
+      "Bash(python3:*)",
+      "WebFetch(domain:www.startbodyweight.com)",
+      "WebFetch(domain:www.garagegymreviews.com)"
+    ]
+  }
+}
