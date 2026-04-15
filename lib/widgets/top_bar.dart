@@ -66,3 +66,14 @@ class FitlingoTopBar extends StatelessWidget implements PreferredSizeWidget {
     );
   }
 }
+
+// Backward-compatible class name used by legacy screens.
+class FitLingoTopBar extends FitlingoTopBar {
+  const FitLingoTopBar({
+    super.key,
+    super.title,
+    super.subtitle,
+    super.showBrand,
+    super.showProfile,
+  });
+}
