@@ -1,50 +1,55 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  // Primary (Forest Green)
-  static const Color primary = Color(0xFF2a6900);
-  static const Color primaryDim = Color(0xFF235b00);
-  static const Color primaryContainer = Color(0xFF84fb42);
-  static const Color primaryFixedDim = Color(0xFF76ec33);
-  static const Color onPrimary = Color(0xFFd5ffb9);
-  static const Color onPrimaryContainer = Color(0xFF245c00);
+  static const bg = Color(0xFFF7FAF8);
+  static const surface = Color(0xFFFFFFFF);
+  static const surfaceSoft = Color(0xFFEEF3EF);
+  static const text = Color(0xFF183126);
+  static const textMuted = Color(0xFF567164);
 
-  // Secondary (Ocean Blue)
-  static const Color secondary = Color(0xFF00628c);
-  static const Color secondaryDim = Color(0xFF00557a);
-  static const Color secondaryContainer = Color(0xFFa3d8ff);
-  static const Color onSecondaryContainer = Color(0xFF004c6e);
+  static const primary = Color(0xFF2BAE66);
+  static const primaryDark = Color(0xFF1D8D50);
+  static const accent = Color(0xFFF5B700);
+  static const danger = Color(0xFFE14E50);
 
-  // Tertiary (Sunshine Yellow)
-  static const Color tertiary = Color(0xFF725800);
-  static const Color tertiaryDim = Color(0xFF644c00);
-  static const Color tertiaryContainer = Color(0xFFfec700);
-  static const Color tertiaryFixedDim = Color(0xFFedba00);
-  static const Color onTertiaryFixed = Color(0xFF403000);
-  static const Color onTertiaryContainer = Color(0xFF574300);
+  static const border = Color(0xFFD7E4DB);
 
-  // Error (Fire Red)
-  static const Color error = Color(0xFFb02500);
-  static const Color errorDim = Color(0xFFb92902);
-  static const Color errorContainer = Color(0xFFf95630);
-  static const Color onError = Color(0xFFffefec);
+  // Legacy aliases for older screens/components still present in the repo.
+  static const primaryDim = primaryDark;
+  static const primaryContainer = Color(0xFFA8E7C5);
+  static const primaryFixedDim = Color(0xFF7BD6A4);
+  static const onPrimary = Color(0xFFFFFFFF);
+  static const onPrimaryContainer = text;
 
-  // Surface
-  static const Color background = Color(0xFFf6f6f6);
-  static const Color surface = Color(0xFFf6f6f6);
-  static const Color surfaceContainerLowest = Color(0xFFFFFFFF);
-  static const Color surfaceContainerLow = Color(0xFFf0f1f1);
-  static const Color surfaceContainer = Color(0xFFe7e8e8);
-  static const Color surfaceContainerHigh = Color(0xFFe1e3e3);
-  static const Color surfaceContainerHighest = Color(0xFFdbdddd);
-  static const Color surfaceDim = Color(0xFFd3d5d5);
+  static const secondary = Color(0xFF2D7DD2);
+  static const secondaryDim = Color(0xFF1B5FA9);
+  static const secondaryContainer = Color(0xFFC9E1FF);
+  static const onSecondaryContainer = Color(0xFF123656);
 
-  // On Surface
-  static const Color onBackground = Color(0xFF2d2f2f);
-  static const Color onSurface = Color(0xFF2d2f2f);
-  static const Color onSurfaceVariant = Color(0xFF5a5c5c);
+  static const tertiary = Color(0xFF8A6A00);
+  static const tertiaryDim = Color(0xFF705500);
+  static const tertiaryContainer = Color(0xFFFFE08F);
+  static const tertiaryFixedDim = Color(0xFFE6C56A);
+  static const onTertiaryFixed = Color(0xFF4F3D00);
+  static const onTertiaryContainer = Color(0xFF4F3D00);
 
-  // Outline
-  static const Color outline = Color(0xFF767777);
-  static const Color outlineVariant = Color(0xFFacadad);
+  static const error = danger;
+  static const errorDim = Color(0xFFB33A3B);
+  static const errorContainer = Color(0xFFF8B8B9);
+  static const onError = Color(0xFFFFFFFF);
+
+  static const background = bg;
+  static const surfaceContainerLowest = surface;
+  static const surfaceContainerLow = surfaceSoft;
+  static const surfaceContainer = Color(0xFFE8EFEA);
+  static const surfaceContainerHigh = Color(0xFFDDE8E0);
+  static const surfaceContainerHighest = Color(0xFFD4E1D8);
+  static const surfaceDim = Color(0xFFC7D7CC);
+
+  static const onBackground = text;
+  static const onSurface = text;
+  static const onSurfaceVariant = textMuted;
+
+  static const outline = border;
+  static const outlineVariant = Color(0xFFB8CABE);
 }

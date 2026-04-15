@@ -1,27 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 
-import 'theme/app_theme.dart';
-import 'models/real_exercise.dart';
-import 'screens/home_screen.dart';
-import 'screens/explore_screen.dart';
-import 'screens/social_screen.dart';
+import 'data/backend_service.dart';
 import 'screens/challenges_screen.dart';
-import 'screens/onboarding_screen.dart';
+import 'screens/home_screen.dart';
+import 'screens/profile_screen.dart';
+import 'screens/social_screen.dart';
+import 'state/fitlingo_store.dart';
+import 'theme/app_theme.dart';
 import 'widgets/bottom_nav.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-    statusBarBrightness: Brightness.light,
-    statusBarIconBrightness: Brightness.dark,
-    statusBarColor: Colors.transparent,
-  ));
-  Animate.defaultDuration = 350.ms;
-  // Pre-load exercise database in background so browse is instant
-  ExerciseDatabase.instance.load();
+void main() {
   runApp(const FitLingoApp());
 }
 
@@ -31,33 +19,11 @@ class FitLingoApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'FitLingo',
       debugShowCheckedModeBanner: false,
+      title: 'FitLingo',
       theme: AppTheme.theme,
-      home: const _RootRouter(),
+      home: const MainShell(),
     );
-  }
-}
-
-/// Routes between onboarding and the main app shell
-class _RootRouter extends StatefulWidget {
-  const _RootRouter();
-
-  @override
-  State<_RootRouter> createState() => _RootRouterState();
-}
-
-class _RootRouterState extends State<_RootRouter> {
-  bool _onboardingDone = false;
-
-  @override
-  Widget build(BuildContext context) {
-    if (!_onboardingDone) {
-      return OnboardingScreen(
-        onComplete: () => setState(() => _onboardingDone = true),
-      );
-    }
-    return const MainShell();
   }
 }
 
@@ -69,25 +35,40 @@ class MainShell extends StatefulWidget {
 }
 
 class _MainShellState extends State<MainShell> {
-  int _currentIndex = 0;
+  late final FitlingoStore _store;
+  int _index = 0;
 
-  static const _screens = [
-    HomeScreen(),
-    ExploreScreen(),
-    SocialScreen(),
-    ChallengesScreen(),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _store = FitlingoStore(BackendService());
+    _store.initialize();
+  }
+
+  @override
+  void dispose() {
+    _store.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _screens,
-      ),
-      bottomNavigationBar: FitLingoBottomNav(
-        currentIndex: _currentIndex,
-        onTap: (i) => setState(() => _currentIndex = i),
+    return FitlingoScope(
+      store: _store,
+      child: Scaffold(
+        body: IndexedStack(
+          index: _index,
+          children: const [
+            HomeScreen(),
+            ChallengesScreen(),
+            SocialScreen(),
+            ProfileScreen(),
+          ],
+        ),
+        bottomNavigationBar: FitLingoBottomNav(
+          currentIndex: _index,
+          onTap: (value) => setState(() => _index = value),
+        ),
       ),
     );
   }
