@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import '../data/models.dart';
 import '../state/fitlingo_store.dart';
 import '../theme/app_colors.dart';
-import '../widgets/top_bar.dart';
 
 class SocialScreen extends StatelessWidget {
   const SocialScreen({super.key});
@@ -16,48 +15,57 @@ class SocialScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final store = FitlingoScope.of(context);
 
-    return Scaffold(
-      appBar: const FitlingoTopBar(
-        title: 'Social Feed',
-        subtitle: 'Photos, likes, comments',
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _openComposer(context),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        icon: const Icon(Icons.add_a_photo_rounded),
-        label: const Text('Post'),
-      ),
-      body: AnimatedBuilder(
-        animation: store,
-        builder: (context, _) {
-          if (store.loadingFeed && store.feed.isEmpty) {
-            return const Center(child: CircularProgressIndicator());
-          }
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        floatingActionButton: FloatingActionButton.extended(
+          onPressed: () => _openComposer(context),
+          backgroundColor: AppColors.primary,
+          foregroundColor: Colors.white,
+          icon: const Icon(Icons.add_a_photo_rounded),
+          label: const Text('Post'),
+        ),
+        body: AnimatedBuilder(
+          animation: store,
+          builder: (context, _) {
+            if (store.loadingFeed && store.feed.isEmpty) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-          return RefreshIndicator(
-            onRefresh: store.refreshFeed,
-            child: ListView(
-              padding: const EdgeInsets.fromLTRB(14, 8, 14, 120),
-              children: [
-                if (store.error != null)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: Text(
-                      store.error!,
-                      style: const TextStyle(color: AppColors.danger),
+            return RefreshIndicator(
+              onRefresh: store.refreshFeed,
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(16, 10, 16, 120),
+                children: [
+                  const Text(
+                    'Social feed',
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900),
+                  ),
+                  const SizedBox(height: 4),
+                  const Text(
+                    'Progress posts with photos, likes, and comments',
+                    style: TextStyle(color: AppColors.textMuted),
+                  ),
+                  const SizedBox(height: 14),
+                  if (store.error != null)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: Text(
+                        store.error!,
+                        style: const TextStyle(color: AppColors.danger),
+                      ),
+                    ),
+                  ...store.feed.map(
+                    (post) => Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: _PostCard(post: post),
                     ),
                   ),
-                ...store.feed.map(
-                  (post) => Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: _PostCard(post: post),
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }
@@ -95,12 +103,9 @@ class _PostCardState extends State<_PostCard> {
     final store = FitlingoScope.of(context);
     final post = widget.post;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
-      ),
+    return Card(
+      margin: EdgeInsets.zero,
+      clipBehavior: Clip.antiAlias,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -109,10 +114,10 @@ class _PostCardState extends State<_PostCard> {
             child: Row(
               children: [
                 CircleAvatar(
-                  radius: 17,
+                  radius: 16,
                   backgroundColor: AppColors.surfaceSoft,
                   child: Text(
-                    post.author.characters.first.toUpperCase(),
+                    post.author.substring(0, 1).toUpperCase(),
                     style: const TextStyle(fontWeight: FontWeight.w700),
                   ),
                 ),
@@ -139,7 +144,7 @@ class _PostCardState extends State<_PostCard> {
             child: Text(post.caption),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 4),
             child: Row(
               children: [
                 TextButton.icon(
@@ -236,10 +241,7 @@ class _PostImage extends StatelessWidget {
       );
     }
 
-    return ClipRRect(
-      borderRadius: const BorderRadius.vertical(bottom: Radius.circular(0)),
-      child: AspectRatio(aspectRatio: 16 / 10, child: image),
-    );
+    return AspectRatio(aspectRatio: 16 / 10, child: image);
   }
 
   Uint8List? _decodeDataUrl(String dataUrl) {
@@ -275,6 +277,9 @@ class _PostComposerSheet extends StatefulWidget {
 
 class _PostComposerSheetState extends State<_PostComposerSheet> {
   final _captionController = TextEditingController();
+  final _imageUrlController = TextEditingController(
+    text: 'https://picsum.photos/seed/newpost/1000/700',
+  );
   Uint8List? _imageBytes;
   String _mimeType = 'image/jpeg';
   bool _posting = false;
@@ -282,6 +287,7 @@ class _PostComposerSheetState extends State<_PostComposerSheet> {
   @override
   void dispose() {
     _captionController.dispose();
+    _imageUrlController.dispose();
     super.dispose();
   }
 
@@ -296,25 +302,8 @@ class _PostComposerSheetState extends State<_PostComposerSheet> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Create Post',
+            'Create post',
             style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18),
-          ),
-          const SizedBox(height: 10),
-          GestureDetector(
-            onTap: _pickImage,
-            child: Container(
-              height: 150,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: AppColors.surface,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppColors.border),
-              ),
-              clipBehavior: Clip.antiAlias,
-              child: _imageBytes == null
-                  ? const Center(child: Text('Tap to choose image'))
-                  : Image.memory(_imageBytes!, fit: BoxFit.cover),
-            ),
           ),
           const SizedBox(height: 10),
           TextField(
@@ -322,6 +311,21 @@ class _PostComposerSheetState extends State<_PostComposerSheet> {
             minLines: 2,
             maxLines: 3,
             decoration: const InputDecoration(hintText: 'Share your session'),
+          ),
+          const SizedBox(height: 10),
+          TextField(
+            controller: _imageUrlController,
+            decoration: const InputDecoration(
+              hintText: 'Image URL (or upload below)',
+            ),
+          ),
+          const SizedBox(height: 8),
+          OutlinedButton.icon(
+            onPressed: _pickImage,
+            icon: const Icon(Icons.upload_rounded),
+            label: Text(
+              _imageBytes == null ? 'Upload image' : 'Image selected',
+            ),
           ),
           const SizedBox(height: 12),
           SizedBox(
@@ -360,18 +364,23 @@ class _PostComposerSheetState extends State<_PostComposerSheet> {
   }
 
   Future<void> _submit() async {
-    if (_imageBytes == null) return;
-
-    setState(() => _posting = true);
     final store = FitlingoScope.of(context);
     final caption = _captionController.text.trim().isEmpty
         ? 'Completed another push-up set.'
         : _captionController.text.trim();
 
-    final dataUrl = 'data:$_mimeType;base64,${base64Encode(_imageBytes!)}';
+    String imageValue = _imageUrlController.text.trim();
+    if (_imageBytes != null) {
+      imageValue = 'data:$_mimeType;base64,${base64Encode(_imageBytes!)}';
+    }
+    if (imageValue.isEmpty) {
+      imageValue = 'https://picsum.photos/seed/fallback/1000/700';
+    }
+
+    setState(() => _posting = true);
 
     try {
-      await store.addPost(caption: caption, imageUrl: dataUrl);
+      await store.addPost(caption: caption, imageUrl: imageValue);
       if (!mounted) return;
       Navigator.pop(context);
     } catch (_) {

@@ -58,11 +58,11 @@ class _MainShellState extends State<MainShell> {
       child: Scaffold(
         body: IndexedStack(
           index: _index,
-          children: const [
-            HomeScreen(),
-            ChallengesScreen(),
-            SocialScreen(),
-            ProfileScreen(),
+          children: [
+            HomeScreen(onOpenChallenge: () => setState(() => _index = 1)),
+            const ChallengesScreen(),
+            const SocialScreen(),
+            const ProfileScreen(),
           ],
         ),
         bottomNavigationBar: FitLingoBottomNav(

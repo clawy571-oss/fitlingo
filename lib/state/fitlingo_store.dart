@@ -12,22 +12,28 @@ class FitlingoStore extends ChangeNotifier {
     PushupMilestone(
       target: 0,
       title: 'Start',
-      subtitle: 'Open your stance and lock form',
+      subtitle: 'Open app and set posture',
     ),
-    PushupMilestone(
-      target: 5,
-      title: 'Warm Up',
-      subtitle: 'Hit five clean reps',
-    ),
+    PushupMilestone(target: 5, title: 'Warmup', subtitle: 'First clean set'),
     PushupMilestone(
       target: 10,
-      title: 'Momentum',
-      subtitle: 'Double down to ten',
+      title: 'Steady',
+      subtitle: 'Two full sets complete',
+    ),
+    PushupMilestone(
+      target: 15,
+      title: 'Focus',
+      subtitle: 'Hold form under fatigue',
     ),
     PushupMilestone(
       target: 20,
-      title: 'Win',
-      subtitle: 'Finish the full challenge',
+      title: 'Strong',
+      subtitle: 'Daily goal unlocked',
+    ),
+    PushupMilestone(
+      target: 30,
+      title: 'Elite',
+      subtitle: 'Bonus reps for streaks',
     ),
   ];
 
@@ -35,8 +41,8 @@ class FitlingoStore extends ChangeNotifier {
   String? error;
   int todayPushups = 0;
   ChallengeSession challenge = const ChallengeSession(
-    id: 'daily-pushup-duel',
-    opponentName: 'Mia',
+    id: 'daily-pushup-challenge',
+    opponentName: 'Alex',
     target: 20,
     yourCount: 0,
     opponentCount: 8,
@@ -44,22 +50,27 @@ class FitlingoStore extends ChangeNotifier {
   );
   List<SocialPost> feed = const [];
 
-  int get nextMilestoneTarget {
-    for (final milestone in milestones) {
-      if (todayPushups < milestone.target) {
-        return milestone.target;
-      }
-    }
-    return milestones.last.target;
-  }
-
-  double get challengeProgress {
-    if (challenge.target == 0) return 0;
-    return (challenge.yourCount / challenge.target).clamp(0, 1);
-  }
-
   int get reachedMilestones =>
       milestones.where((m) => todayPushups >= m.target).length;
+
+  int get currentStepIndex {
+    for (var i = 0; i < milestones.length; i++) {
+      if (todayPushups < milestones[i].target) {
+        return i;
+      }
+    }
+    return milestones.length - 1;
+  }
+
+  int get nextMilestoneTarget => milestones[currentStepIndex].target;
+
+  int get repsRemaining =>
+      (challenge.target - todayPushups).clamp(0, challenge.target);
+
+  double get dayProgress {
+    if (challenge.target == 0) return 0;
+    return (todayPushups / challenge.target).clamp(0, 1);
+  }
 
   Future<void> initialize() async {
     if (!loadingFeed) return;
@@ -85,8 +96,32 @@ class FitlingoStore extends ChangeNotifier {
   }
 
   Future<void> incrementPushup() async {
-    todayPushups += 1;
-    challenge = challenge.copyWith(yourCount: challenge.yourCount + 1);
+    final next = todayPushups + 1;
+    await _setPushupCount(next);
+  }
+
+  Future<void> decrementPushup() async {
+    if (todayPushups == 0) return;
+    final next = todayPushups - 1;
+    await _setPushupCount(next);
+  }
+
+  Future<void> resetPushups() async {
+    await _setPushupCount(0);
+  }
+
+  Future<void> _setPushupCount(int count) async {
+    todayPushups = count.clamp(0, milestones.last.target * 3);
+    final simulatedOpponent =
+        (challenge.opponentCount + (todayPushups / 3).floor()).clamp(
+          0,
+          challenge.target + 6,
+        );
+
+    challenge = challenge.copyWith(
+      yourCount: todayPushups,
+      opponentCount: simulatedOpponent,
+    );
     notifyListeners();
 
     try {
@@ -95,7 +130,7 @@ class FitlingoStore extends ChangeNotifier {
         count: challenge.yourCount,
       );
     } catch (_) {
-      // UI is optimistic and keeps local progress.
+      // Keep optimistic state.
     }
   }
 

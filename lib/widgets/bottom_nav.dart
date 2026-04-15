@@ -13,17 +13,20 @@ class FitLingoBottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return NavigationBar(
-      height: 72,
+      height: 74,
       selectedIndex: currentIndex,
       onDestinationSelected: onTap,
       destinations: const [
-        NavigationDestination(icon: Icon(Icons.route_rounded), label: 'Path'),
         NavigationDestination(
-          icon: Icon(Icons.sports_gymnastics_rounded),
+          icon: Icon(Icons.alt_route_rounded),
+          label: 'Path',
+        ),
+        NavigationDestination(
+          icon: Icon(Icons.touch_app_rounded),
           label: 'Challenge',
         ),
         NavigationDestination(
-          icon: Icon(Icons.groups_rounded),
+          icon: Icon(Icons.photo_library_rounded),
           label: 'Social',
         ),
         NavigationDestination(
