@@ -1,24 +1,27 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  static const bg = Color(0xFFF7FAF8);
+  static const bg = Color(0xFFF5F7F3);
   static const surface = Color(0xFFFFFFFF);
-  static const surfaceSoft = Color(0xFFEEF3EF);
-  static const text = Color(0xFF183126);
-  static const textMuted = Color(0xFF567164);
+  static const surfaceSoft = Color(0xFFEAF0E7);
 
-  static const primary = Color(0xFF2BAE66);
-  static const primaryDark = Color(0xFF1D8D50);
-  static const accent = Color(0xFFF5B700);
-  static const danger = Color(0xFFE14E50);
+  static const text = Color(0xFF1D2A1F);
+  static const textMuted = Color(0xFF5C6E60);
 
-  static const border = Color(0xFFD7E4DB);
+  static const primary = Color(0xFF4EA64E);
+  static const primaryDark = Color(0xFF378637);
+  static const accent = Color(0xFFF3B61F);
+  static const danger = Color(0xFFD94A4A);
 
-  // Legacy aliases for older screens/components still present in the repo.
+  static const border = Color(0xFFD5DECE);
+
+  static const onPrimary = Color(0xFFFFFFFF);
+  static const onSurface = text;
+
+  // Compatibility aliases for legacy screens still present in the repo.
   static const primaryDim = primaryDark;
   static const primaryContainer = Color(0xFFA8E7C5);
   static const primaryFixedDim = Color(0xFF7BD6A4);
-  static const onPrimary = Color(0xFFFFFFFF);
   static const onPrimaryContainer = text;
 
   static const secondary = Color(0xFF2D7DD2);
@@ -47,7 +50,6 @@ class AppColors {
   static const surfaceDim = Color(0xFFC7D7CC);
 
   static const onBackground = text;
-  static const onSurface = text;
   static const onSurfaceVariant = textMuted;
 
   static const outline = border;

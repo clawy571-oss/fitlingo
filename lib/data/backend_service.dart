@@ -1,100 +1,104 @@
-import 'dart:convert';
-
-import 'package:http/http.dart' as http;
+import 'dart:async';
 
 import 'models.dart';
 
 class BackendService {
-  static final Uri _photosEndpoint = Uri.parse(
-    'https://jsonplaceholder.typicode.com/photos?_limit=12',
-  );
-  static final Uri _postsEndpoint = Uri.parse(
-    'https://jsonplaceholder.typicode.com/posts',
-  );
-  static final Uri _commentsEndpoint = Uri.parse(
-    'https://jsonplaceholder.typicode.com/comments',
-  );
+  BackendService() : _posts = _seedPosts();
+
+  final List<SocialPost> _posts;
+  int _nextId = 1000;
 
   Future<List<SocialPost>> fetchFeed() async {
-    final response = await http.get(_photosEndpoint);
-    if (response.statusCode != 200) {
-      throw Exception('Unable to load social feed');
-    }
-
-    final decoded = jsonDecode(response.body) as List<dynamic>;
-    return decoded.take(10).map((item) {
-      final map = item as Map<String, dynamic>;
-      final id = map['id'].toString();
-      return SocialPost(
-        id: id,
-        author: 'Athlete ${(map['albumId'] ?? 0) as int}',
-        caption: (map['title'] as String)
-            .replaceAll('_', ' ')
-            .replaceFirstMapped(
-              RegExp(r'^[a-z]'),
-              (m) => m.group(0)!.toUpperCase(),
-            ),
-        imageUrl: map['url'] as String,
-        createdAt: DateTime.now().subtract(
-          Duration(minutes: int.parse(id) * 3),
-        ),
-        pushupCount: 5 + (int.parse(id) % 16),
-        likeCount: 2 + (int.parse(id) % 19),
-        likedByMe: false,
-        comments: const [],
-      );
-    }).toList();
+    await Future<void>.delayed(const Duration(milliseconds: 250));
+    return _posts
+        .map((post) => post.copyWith(comments: [...post.comments]))
+        .toList();
   }
 
   Future<void> sendChallengeCount({
     required String challengeId,
     required int count,
   }) async {
-    await http.post(
-      _postsEndpoint,
-      headers: {'Content-Type': 'application/json; charset=UTF-8'},
-      body: jsonEncode({
-        'challengeId': challengeId,
-        'count': count,
-        'timestamp': DateTime.now().toIso8601String(),
-      }),
-    );
+    await Future<void>.delayed(const Duration(milliseconds: 120));
   }
 
   Future<String> createPost({
     required String caption,
     required int pushupCount,
   }) async {
-    final response = await http.post(
-      _postsEndpoint,
-      headers: {'Content-Type': 'application/json; charset=UTF-8'},
-      body: jsonEncode({'caption': caption, 'pushupCount': pushupCount}),
-    );
-
-    if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw Exception('Unable to create post');
-    }
-
-    final decoded = jsonDecode(response.body) as Map<String, dynamic>;
-    return decoded['id'].toString();
+    await Future<void>.delayed(const Duration(milliseconds: 150));
+    _nextId += 1;
+    return _nextId.toString();
   }
 
   Future<void> sendLike({required String postId, required bool liked}) async {
-    await http.post(
-      _postsEndpoint,
-      headers: {'Content-Type': 'application/json; charset=UTF-8'},
-      body: jsonEncode({'postId': postId, 'liked': liked}),
-    );
+    await Future<void>.delayed(const Duration(milliseconds: 120));
   }
 
   Future<void> sendComment({
     required String postId,
     required String message,
   }) async {
-    await http.post(
-      _commentsEndpoint,
-      headers: {'Content-Type': 'application/json; charset=UTF-8'},
-      body: jsonEncode({'postId': postId, 'body': message}),
-    );
+    await Future<void>.delayed(const Duration(milliseconds: 120));
+  }
+
+  static List<SocialPost> _seedPosts() {
+    final now = DateTime.now();
+
+    return [
+      SocialPost(
+        id: '101',
+        author: 'Nina',
+        caption: 'Finished my 10 rep checkpoint before class.',
+        imageUrl: 'https://picsum.photos/seed/fitlingo-a/1000/700',
+        createdAt: now.subtract(const Duration(minutes: 12)),
+        pushupCount: 10,
+        likeCount: 21,
+        likedByMe: false,
+        comments: [
+          SocialComment(
+            id: 'c1',
+            author: 'Leo',
+            message: 'Solid pace. Keep it going.',
+            createdAt: now.subtract(const Duration(minutes: 8)),
+          ),
+        ],
+      ),
+      SocialPost(
+        id: '102',
+        author: 'Mia',
+        caption: '20 reps complete. Broke it into four clean sets.',
+        imageUrl: 'https://picsum.photos/seed/fitlingo-b/1000/700',
+        createdAt: now.subtract(const Duration(minutes: 34)),
+        pushupCount: 20,
+        likeCount: 31,
+        likedByMe: true,
+        comments: [
+          SocialComment(
+            id: 'c2',
+            author: 'Arjun',
+            message: 'That consistency is elite.',
+            createdAt: now.subtract(const Duration(minutes: 28)),
+          ),
+          SocialComment(
+            id: 'c3',
+            author: 'Sara',
+            message: 'I am copying your pacing plan tomorrow.',
+            createdAt: now.subtract(const Duration(minutes: 25)),
+          ),
+        ],
+      ),
+      SocialPost(
+        id: '103',
+        author: 'Theo',
+        caption: 'Early morning set done. 5 reps before breakfast.',
+        imageUrl: 'https://picsum.photos/seed/fitlingo-c/1000/700',
+        createdAt: now.subtract(const Duration(hours: 2)),
+        pushupCount: 5,
+        likeCount: 9,
+        likedByMe: false,
+        comments: const [],
+      ),
+    ];
   }
 }

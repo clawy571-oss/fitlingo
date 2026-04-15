@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../theme/app_colors.dart';
-
 class FitLingoBottomNav extends StatelessWidget {
   const FitLingoBottomNav({
     super.key,
@@ -15,10 +13,9 @@ class FitLingoBottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return NavigationBar(
+      height: 72,
       selectedIndex: currentIndex,
       onDestinationSelected: onTap,
-      backgroundColor: AppColors.surface,
-      indicatorColor: AppColors.surfaceSoft,
       destinations: const [
         NavigationDestination(icon: Icon(Icons.route_rounded), label: 'Path'),
         NavigationDestination(

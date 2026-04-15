@@ -17,13 +17,13 @@ class FitlingoTopBar extends StatelessWidget implements PreferredSizeWidget {
   final bool showProfile;
 
   @override
-  Size get preferredSize => const Size.fromHeight(72);
+  Size get preferredSize => const Size.fromHeight(70);
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      toolbarHeight: 72,
-      titleSpacing: 20,
+      toolbarHeight: 70,
+      titleSpacing: 18,
       title: Row(
         children: [
           Expanded(
@@ -32,9 +32,9 @@ class FitlingoTopBar extends StatelessWidget implements PreferredSizeWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  showBrand ? 'FitLingo' : (title ?? 'FitLingo'),
+                  showBrand ? 'Fitlingo' : (title ?? 'Fitlingo'),
                   style: const TextStyle(
-                    fontSize: 22,
+                    fontSize: 21,
                     fontWeight: FontWeight.w800,
                     color: AppColors.text,
                   ),
@@ -67,7 +67,6 @@ class FitlingoTopBar extends StatelessWidget implements PreferredSizeWidget {
   }
 }
 
-// Backward-compatible class name used by legacy screens.
 class FitLingoTopBar extends FitlingoTopBar {
   const FitLingoTopBar({
     super.key,

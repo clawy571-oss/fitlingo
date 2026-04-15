@@ -19,7 +19,7 @@ class SocialScreen extends StatelessWidget {
     return Scaffold(
       appBar: const FitlingoTopBar(
         title: 'Social Feed',
-        subtitle: 'Posts, likes, and comments',
+        subtitle: 'Photos, likes, comments',
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _openComposer(context),
@@ -38,11 +38,11 @@ class SocialScreen extends StatelessWidget {
           return RefreshIndicator(
             onRefresh: store.refreshFeed,
             child: ListView(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 120),
+              padding: const EdgeInsets.fromLTRB(14, 8, 14, 120),
               children: [
                 if (store.error != null)
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.only(bottom: 10),
                     child: Text(
                       store.error!,
                       style: const TextStyle(color: AppColors.danger),
@@ -66,7 +66,7 @@ class SocialScreen extends StatelessWidget {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.bg,
       builder: (_) => const _PostComposerSheet(),
     );
   }
@@ -105,44 +105,41 @@ class _PostCardState extends State<_PostCard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(14, 14, 14, 10),
+            padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
             child: Row(
               children: [
                 CircleAvatar(
-                  radius: 18,
+                  radius: 17,
                   backgroundColor: AppColors.surfaceSoft,
                   child: Text(
                     post.author.characters.first.toUpperCase(),
-                    style: const TextStyle(color: AppColors.text),
+                    style: const TextStyle(fontWeight: FontWeight.w700),
                   ),
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     post.author,
-                    style: const TextStyle(fontWeight: FontWeight.w700),
+                    style: const TextStyle(fontWeight: FontWeight.w800),
                   ),
                 ),
                 Text(
                   '${post.pushupCount} reps',
                   style: const TextStyle(
                     color: AppColors.textMuted,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ],
             ),
           ),
-          ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(2)),
-            child: _PostImage(imageUrl: post.imageUrl),
-          ),
+          _PostImage(imageUrl: post.imageUrl),
           Padding(
-            padding: const EdgeInsets.fromLTRB(14, 10, 14, 4),
+            padding: const EdgeInsets.fromLTRB(12, 10, 12, 4),
             child: Text(post.caption),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14),
+            padding: const EdgeInsets.symmetric(horizontal: 6),
             child: Row(
               children: [
                 TextButton.icon(
@@ -157,7 +154,6 @@ class _PostCardState extends State<_PostCard> {
                   ),
                   label: Text('${post.likeCount}'),
                 ),
-                const SizedBox(width: 8),
                 Text(
                   '${post.comments.length} comments',
                   style: const TextStyle(color: AppColors.textMuted),
@@ -167,13 +163,13 @@ class _PostCardState extends State<_PostCard> {
           ),
           if (post.comments.isNotEmpty)
             Padding(
-              padding: const EdgeInsets.fromLTRB(14, 2, 14, 8),
+              padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: post.comments
                     .map(
                       (comment) => Padding(
-                        padding: const EdgeInsets.only(bottom: 4),
+                        padding: const EdgeInsets.only(bottom: 3),
                         child: Text(
                           '${comment.author}: ${comment.message}',
                           style: const TextStyle(color: AppColors.textMuted),
@@ -184,24 +180,23 @@ class _PostCardState extends State<_PostCard> {
               ),
             ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+            padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
             child: Row(
               children: [
                 Expanded(
                   child: TextField(
                     controller: _commentController,
                     decoration: const InputDecoration(
-                      hintText: 'Write a comment',
+                      hintText: 'Add a comment',
                       isDense: true,
-                      border: OutlineInputBorder(),
                     ),
                   ),
                 ),
                 IconButton(
                   onPressed: () async {
-                    final text = _commentController.text;
+                    final message = _commentController.text;
                     _commentController.clear();
-                    await store.addComment(postId: post.id, message: text);
+                    await store.addComment(postId: post.id, message: message);
                   },
                   icon: const Icon(Icons.send_rounded),
                 ),
@@ -221,29 +216,29 @@ class _PostImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Widget image;
+
     if (imageUrl.startsWith('data:')) {
       final bytes = _decodeDataUrl(imageUrl);
-      if (bytes != null) {
-        return Image.memory(
-          bytes,
-          height: 210,
-          width: double.infinity,
-          fit: BoxFit.cover,
-        );
-      }
+      image = bytes == null
+          ? const _BrokenImage()
+          : Image.memory(bytes, fit: BoxFit.cover, width: double.infinity);
+    } else {
+      image = Image.network(
+        imageUrl,
+        fit: BoxFit.cover,
+        width: double.infinity,
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return const Center(child: CircularProgressIndicator());
+        },
+        errorBuilder: (context, error, stackTrace) => const _BrokenImage(),
+      );
     }
 
-    return Image.network(
-      imageUrl,
-      height: 210,
-      width: double.infinity,
-      fit: BoxFit.cover,
-      errorBuilder: (context, error, stackTrace) => Container(
-        height: 210,
-        color: AppColors.surfaceSoft,
-        alignment: Alignment.center,
-        child: const Text('Image failed to load'),
-      ),
+    return ClipRRect(
+      borderRadius: const BorderRadius.vertical(bottom: Radius.circular(0)),
+      child: AspectRatio(aspectRatio: 16 / 10, child: image),
     );
   }
 
@@ -251,11 +246,23 @@ class _PostImage extends StatelessWidget {
     try {
       final index = dataUrl.indexOf(',');
       if (index < 0) return null;
-      final raw = dataUrl.substring(index + 1);
-      return base64Decode(raw);
+      return base64Decode(dataUrl.substring(index + 1));
     } catch (_) {
       return null;
     }
+  }
+}
+
+class _BrokenImage extends StatelessWidget {
+  const _BrokenImage();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: AppColors.surfaceSoft,
+      alignment: Alignment.center,
+      child: const Text('Image unavailable'),
+    );
   }
 }
 
@@ -280,10 +287,10 @@ class _PostComposerSheetState extends State<_PostComposerSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+    final inset = MediaQuery.of(context).viewInsets.bottom;
 
     return Padding(
-      padding: EdgeInsets.fromLTRB(16, 18, 16, bottomInset + 20),
+      padding: EdgeInsets.fromLTRB(16, 14, 16, inset + 20),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -292,20 +299,20 @@ class _PostComposerSheetState extends State<_PostComposerSheet> {
             'Create Post',
             style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
           GestureDetector(
             onTap: _pickImage,
             child: Container(
-              height: 160,
+              height: 150,
               width: double.infinity,
               decoration: BoxDecoration(
-                color: AppColors.surfaceSoft,
+                color: AppColors.surface,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: AppColors.border),
               ),
               clipBehavior: Clip.antiAlias,
               child: _imageBytes == null
-                  ? const Center(child: Text('Tap to upload photo'))
+                  ? const Center(child: Text('Tap to choose image'))
                   : Image.memory(_imageBytes!, fit: BoxFit.cover),
             ),
           ),
@@ -314,17 +321,14 @@ class _PostComposerSheetState extends State<_PostComposerSheet> {
             controller: _captionController,
             minLines: 2,
             maxLines: 3,
-            decoration: const InputDecoration(
-              hintText: 'What did you train today?',
-              border: OutlineInputBorder(),
-            ),
+            decoration: const InputDecoration(hintText: 'Share your session'),
           ),
           const SizedBox(height: 12),
           SizedBox(
             width: double.infinity,
             child: FilledButton(
               onPressed: _posting ? null : _submit,
-              child: Text(_posting ? 'Posting...' : 'Post to feed'),
+              child: Text(_posting ? 'Posting...' : 'Post'),
             ),
           ),
         ],
@@ -338,6 +342,7 @@ class _PostComposerSheetState extends State<_PostComposerSheet> {
       withData: true,
     );
     if (result == null || result.files.isEmpty) return;
+
     final file = result.files.single;
     if (file.bytes == null) return;
 
